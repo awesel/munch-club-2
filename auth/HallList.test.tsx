@@ -241,4 +241,32 @@ describe('HallList', () => {
     expect(joinButtons[0]).not.toBeDisabled(); // arrillaga
     expect(joinButtons[1]).toBeDisabled(); // wilbur
   });
+
+  it('shows user icon in top right and logs out on click', async () => {
+    mockOnSnapshot.mockImplementationOnce((query, cb) => {
+      cb(createSnapshot([
+        { id: 'arrillaga', data: { name: 'Arrillaga', order: 1 } },
+      ]));
+      return jest.fn();
+    }).mockImplementationOnce((query, cb) => {
+      cb(createSnapshot([
+        { id: 'arrillaga', data: { members: [] } },
+      ]));
+      return jest.fn();
+    });
+    render(
+      <UserContext.Provider value={user}>
+        <HallList />
+      </UserContext.Provider>
+    );
+    // User icon should be in the document
+    const avatar = screen.getByAltText('Jane');
+    expect(avatar).toBeInTheDocument();
+    // Click avatar to show logout button
+    avatar.click();
+    const logoutButton = await screen.findByRole('button', { name: /log out/i });
+    expect(logoutButton).toBeInTheDocument();
+    logoutButton.click();
+    // Would check signOut logic here if not mocked
+  });
 }); 

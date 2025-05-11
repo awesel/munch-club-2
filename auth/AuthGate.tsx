@@ -106,7 +106,12 @@ export const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) 
               e.preventDefault();
               setPhoneSubmitted(true);
               if (user) {
-                await setDoc(doc(db, 'users', user.uid), { phone });
+                // Save both name and phone
+                const nameParts = user.displayName?.trim().split(/\s+/) || [];
+                let firstName = nameParts[0] || '';
+                let lastInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1][0] : '';
+                const name = `${firstName} ${lastInitial ? lastInitial + '.' : ''}`.trim();
+                await setDoc(doc(db, 'users', user.uid), { name, phone });
               }
             }}
             className="w-full flex flex-col items-center gap-4"

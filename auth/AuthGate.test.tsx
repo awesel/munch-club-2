@@ -156,4 +156,21 @@ describe('AuthGate', () => {
     render(<AuthGate children={"Protected"} />);
     await waitFor(() => expect(screen.getByText('Protected')).toBeInTheDocument());
   });
+
+  it('saves both name and phone to Firestore on phone submit', async () => {
+    mockOnAuthStateChanged.mockImplementationOnce(cb => cb({ uid: '1', email: 'jane@stanford.edu', displayName: 'Jane Doe', photoURL: 'x' }));
+    mockValidateStanfordEmail.mockResolvedValueOnce(true);
+    mockGetDoc.mockResolvedValueOnce({ exists: () => false });
+    render(<AuthGate children={"Protected"} />);
+    await waitFor(() => expect(screen.getByLabelText(/phone number/i)).toBeInTheDocument());
+    fireEvent.change(screen.getByLabelText(/phone number/i), { target: { value: '5551234567' } });
+    fireEvent.click(screen.getByRole('button', { name: /submit phone/i }));
+    await waitFor(() => expect(mockSetDoc).toHaveBeenCalled());
+    // Check that setDoc was called with both name and phone
+    const callArgs = mockSetDoc.mock.calls[0][1];
+    expect(callArgs).toMatchObject({
+      phone: '5551234567',
+      name: 'Jane D.'
+    });
+  });
 }); 
