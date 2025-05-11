@@ -23,7 +23,7 @@ interface User {
   uid: string;
   name: string;
   photoURL: string;
-  phone?: string;
+  phone: string;
 }
 
 const ONE_HOUR = 60 * 60 * 1000;
