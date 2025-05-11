@@ -31,6 +31,7 @@ const ONE_HOUR = 60 * 60 * 1000;
 const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
   const { isPresent, join, leave, members } = usePresence(hall, user);
   const [showMatchModal, setShowMatchModal] = useState(false);
+  const [showTextAlert, setShowTextAlert] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const now = Date.now();
   const activeMembers = (members || []).filter(
@@ -40,6 +41,13 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
   const otherMembers = activeMembers.filter(m => m.uid !== user.uid);
   const activeHallId = useUserActiveHall();
   const isInAnotherHall = activeHallId && activeHallId !== hall.id;
+
+  const handleJoin = async () => {
+    await join();
+    if (otherMembers.length > 0) {
+      setShowTextAlert(true);
+    }
+  };
 
   const handleLeave = async () => {
     await leave();
@@ -58,13 +66,15 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
     setSubmitting(false);
   };
 
+  const closeTextAlert = () => setShowTextAlert(false);
+
   return (
     <div>
       <div>
         <strong>{hall.name}</strong> <span>{activeMembers.length}</span>
       </div>
       <div>
-        {activeMembers.map(m => (
+        {otherMembers.map(m => (
           <div key={m.uid} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
             <img src={m.photoURL} alt={m.name} style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 8 }} />
             <span style={{ marginRight: 8 }}>
@@ -85,7 +95,7 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
           </button>
         ) : (
           <button
-            onClick={join}
+            onClick={handleJoin}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold shadow hover:bg-purple-700 transition"
             disabled={!!isInAnotherHall}
             title={isInAnotherHall ? 'You can only join one dining hall at a time. Leave your current hall to join another.' : ''}
@@ -94,6 +104,27 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
           </button>
         )}
       </div>
+      {showTextAlert && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
+            <p className="mb-4 text-lg font-semibold">Someone is already in this dining hall! Please text them to coordinate.</p>
+            <div className="flex gap-4">
+              <button
+                onClick={closeTextAlert}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600"
+              >
+                I've already texted
+              </button>
+              <button
+                onClick={closeTextAlert}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600"
+              >
+                I'll text now!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showMatchModal && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">

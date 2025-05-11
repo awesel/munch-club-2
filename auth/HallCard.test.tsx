@@ -161,4 +161,27 @@ describe('HallCard', () => {
     expect(screen.getByText('John')).toBeInTheDocument();
     expect(screen.getByText('555-2222')).toBeInTheDocument();
   });
+
+  it('shows alert modal when joining a hall with other members', async () => {
+    // Hall has another member (not the user)
+    const otherMembers = [
+      { uid: '2', name: 'John', photoURL: 'john.jpg', updatedAt: Date.now(), phone: '555-2222' },
+    ];
+    mockUsePresence.mockReturnValue({
+      isPresent: false,
+      join: mockJoin,
+      leave: mockLeave,
+      members: [
+        { uid: '1', name: 'Jane', photoURL: 'jane.jpg', updatedAt: Date.now(), phone: '555-1111' },
+        ...otherMembers,
+      ],
+    });
+    render(<HallCard hall={hall} user={user} />);
+    fireEvent.click(screen.getByRole('button', { name: /join/i }));
+    // Simulate the join logic triggering the modal
+    // The modal should appear if there are other members
+    expect(await screen.findByText(/someone is already in this dining hall/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /i've already texted/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /i'll text now!/i })).toBeInTheDocument();
+  });
 }); 
