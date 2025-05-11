@@ -52,6 +52,12 @@ function createSnapshot(docs: any[]) {
   };
 }
 
+jest.mock('./useHallGroups', () => ({
+  useUserActiveHall: jest.fn(),
+  useHallGroups: jest.requireActual('./useHallGroups').useHallGroups,
+}));
+import { useUserActiveHall } from './useHallGroups';
+
 describe('HallList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -64,6 +70,7 @@ describe('HallList', () => {
       exists: () => false,
       data: () => ({}),
     }));
+    (useUserActiveHall as jest.Mock).mockReturnValue(null);
   });
 
   it('shows loading state initially', () => {
@@ -185,5 +192,53 @@ describe('HallList', () => {
     });
     // Should find the other member's avatar
     expect(images.some(img => img.getAttribute('src') === 'john.jpg')).toBe(true);
+  });
+
+  it('renders the informational blurb about how the site works', async () => {
+    // Simulate Firestore returning halls and active groups (empty for this test)
+    mockOnSnapshot.mockImplementationOnce((query, cb) => {
+      cb({ docs: [] }); // diningHalls
+      return jest.fn();
+    }).mockImplementationOnce((query, cb) => {
+      cb({ docs: [] }); // activeGroups
+      return jest.fn();
+    });
+    render(
+      <UserContext.Provider value={user}>
+        <HallList />
+      </UserContext.Provider>
+    );
+    // Wait for loading to disappear
+    await waitFor(() => expect(screen.queryByTestId('hall-list-loading')).not.toBeInTheDocument());
+    // Use a flexible matcher for the blurb
+    expect(screen.getByTestId('hall-list-blurb')).toHaveTextContent(
+      /If someone's looking for a meal, text them hello! If nobody's in the dining hall you want to eat in, or you want more people in your group, add yourself to your favorite dining hall! Our users typically recieve a text from someone trying to eat in just a few minutes. Be patient!/i
+    );
+  });
+
+  it('disables all Join buttons except the one for the hall the user is in', () => {
+    mockOnSnapshot.mockImplementationOnce((query, cb) => {
+      cb(createSnapshot([
+        { id: 'arrillaga', data: { name: 'Arrillaga', order: 1 } },
+        { id: 'wilbur', data: { name: 'Wilbur', order: 2 } },
+      ]));
+      return jest.fn();
+    }).mockImplementationOnce((query, cb) => {
+      cb(createSnapshot([
+        { id: 'arrillaga', data: { members: [{ uid: '1', name: 'Jane', photoURL: 'jane.jpg', updatedAt: Date.now() }] } },
+        { id: 'wilbur', data: { members: [] } },
+      ]));
+      return jest.fn();
+    });
+    (useUserActiveHall as jest.Mock).mockReturnValue('arrillaga');
+    render(
+      <UserContext.Provider value={user}>
+        <HallList />
+      </UserContext.Provider>
+    );
+    const joinButtons = screen.getAllByRole('button', { name: /join/i });
+    expect(joinButtons.length).toBe(2);
+    expect(joinButtons[0]).not.toBeDisabled(); // arrillaga
+    expect(joinButtons[1]).toBeDisabled(); // wilbur
   });
 }); 

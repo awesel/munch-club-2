@@ -7,9 +7,7 @@ export default function Home() {
   const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // TODO: You must update your Firestore security rules to allow authenticated users to write to 'diningHalls'.
-  // The error you saw: 'permission-denied' means your current rules are too restrictive.
-  // See: https://firebase.google.com/docs/firestore/security/get-started
+
 
   return (
     <AuthGate>

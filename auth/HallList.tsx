@@ -21,18 +21,23 @@ const HallList: React.FC = () => {
   if (!user) return null;
   if (loading) return <div data-testid="hall-list-loading">Loading…</div>;
   return (
-    <ul>
-      {halls.map(hall => (
-        <li key={hall.id}>
-          <HallCard hall={{ id: hall.id, name: hall.name, members: [] }} user={{
-            uid: user.uid,
-            name: user.name,
-            photoURL: user.photoURL || '',
-            phone: user.phone
-          }} />
-        </li>
-      ))}
-    </ul>
+    <>
+      <div data-testid="hall-list-blurb" style={{ marginBottom: 16, fontSize: '1.1em', color: '#444' }}>
+        {`If someone's looking for a meal, text them hello! If nobody's in the dining hall you want to eat in, or you want more people in your group, add yourself to your favorite dining hall! Our users typically recieve a text from someone trying to eat in just a few minutes. Be patient!`}
+      </div>
+      <ul>
+        {halls.map(hall => (
+          <li key={hall.id}>
+            <HallCard hall={{ id: hall.id, name: hall.name, members: [] }} user={{
+              uid: user.uid,
+              name: user.name,
+              photoURL: user.photoURL || '',
+              phone: user.phone
+            }} />
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 

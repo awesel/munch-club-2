@@ -3,6 +3,7 @@ import { usePresence } from './usePresence';
 import { db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useState } from 'react';
+import { useUserActiveHall } from './useHallGroups';
 
 interface Member {
   uid: string;
@@ -37,6 +38,8 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
   );
 
   const otherMembers = activeMembers.filter(m => m.uid !== user.uid);
+  const activeHallId = useUserActiveHall();
+  const isInAnotherHall = activeHallId && activeHallId !== hall.id;
 
   const handleLeave = async () => {
     await leave();
@@ -83,6 +86,8 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
           <button
             onClick={join}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold shadow hover:bg-purple-700 transition"
+            disabled={!!isInAnotherHall}
+            title={isInAnotherHall ? 'You can only join one dining hall at a time. Leave your current hall to join another.' : ''}
           >
             Join
           </button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { db } from '../firebase';
 import {
   collection,
@@ -8,6 +8,7 @@ import {
   orderBy,
   doc,
 } from 'firebase/firestore';
+import { UserContext } from './HallList';
 
 export interface HallGroup {
   id: string;
@@ -68,4 +69,30 @@ export function useHallGroups(): { loading: boolean; halls: HallGroup[] } {
   }, []);
 
   return { loading, halls };
+}
+
+// Returns the hallId the user is present in, or null if not present in any
+export function useUserActiveHall(): string | null {
+  const user = useContext(UserContext);
+  const [activeHallId, setActiveHallId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setActiveHallId(null);
+      return;
+    }
+    const unsub = onSnapshot(collection(db, 'activeGroups'), snap => {
+      let found: string | null = null;
+      snap.docs.forEach(doc => {
+        const data = doc.data();
+        if (Array.isArray(data.members) && data.members.some((m: any) => m.uid === user.uid)) {
+          found = doc.id;
+        }
+      });
+      setActiveHallId(found);
+    });
+    return () => unsub();
+  }, [user]);
+
+  return activeHallId;
 } 

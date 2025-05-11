@@ -81,7 +81,7 @@ export const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) 
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 p-8">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col items-center">
           <h1 className="text-4xl font-extrabold text-center text-purple-700 mb-4 drop-shadow">Munch Club</h1>
-          <p className="text-lg text-gray-700 mb-6 text-center">A site to find people who want more people to eat with. Sign in to join a dining group or start your own!</p>
+          <p className="text-lg text-gray-700 mb-6 text-center">Eat with your friends!</p>
           <button
             onClick={handleLogin}
             aria-label="Sign in with Google"

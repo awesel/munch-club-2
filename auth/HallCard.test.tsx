@@ -32,6 +32,11 @@ jest.mock('../firebase', () => ({
   db: {},
 }));
 
+jest.mock('./useHallGroups', () => ({
+  useUserActiveHall: jest.fn(),
+}));
+import { useUserActiveHall } from './useHallGroups';
+
 describe('HallCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,6 +46,7 @@ describe('HallCard', () => {
       leave: mockLeave,
       members: hall.members,
     });
+    (useUserActiveHall as jest.Mock).mockReturnValue(null);
   });
 
   it('renders avatars of current members', () => {
@@ -140,5 +146,13 @@ describe('HallCard', () => {
       hallId: hall.id,
       answer: true,
     }));
+  });
+
+  it('disables Join button if user is present in another hall', () => {
+    (useUserActiveHall as jest.Mock).mockReturnValue('wilbur'); // user is in a different hall
+    render(<HallCard hall={hall} user={user} />);
+    const joinButton = screen.getByRole('button', { name: /join/i });
+    expect(joinButton).toBeDisabled();
+    expect(joinButton).toHaveAttribute('title', expect.stringMatching(/only join one dining hall/i));
   });
 }); 
