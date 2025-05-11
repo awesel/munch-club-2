@@ -16,6 +16,7 @@ interface Member {
   name: string;
   photoURL: string;
   updatedAt: number;
+  phone: string;
 }
 
 interface Hall {
@@ -28,6 +29,7 @@ interface User {
   uid: string;
   name: string;
   photoURL: string;
+  phone: string;
 }
 
 const ONE_HOUR = 60 * 60 * 1000;
@@ -64,6 +66,7 @@ export function usePresence(hall: Hall, user: User) {
       name: user.name,
       photoURL: user.photoURL,
       updatedAt: Date.now(),
+      phone: user.phone,
     };
     const snap = await getDoc(groupRef);
     if (!snap.exists()) {

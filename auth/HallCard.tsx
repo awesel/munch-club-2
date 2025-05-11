@@ -10,7 +10,7 @@ interface Member {
   name: string;
   photoURL: string;
   updatedAt: number;
-  phone?: string;
+  phone: string;
 }
 
 interface Hall {
@@ -65,7 +65,11 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
       </div>
       <div>
         {otherMembers.length > 0 && otherMembers.map(m => (
-          <img key={m.uid} src={m.photoURL} alt={m.name} style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 4 }} />
+          <div key={m.uid} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <img src={m.photoURL} alt={m.name} style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 8 }} />
+            <span>{m.name}</span>
+            <span style={{ marginLeft: 8, color: '#888' }}>{m.phone}</span>
+          </div>
         ))}
       </div>
       <div>

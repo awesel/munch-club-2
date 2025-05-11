@@ -12,13 +12,13 @@ jest.mock('./usePresence', () => ({
 
 import HallCard from './HallCard';
 
-const user = { uid: '1', name: 'Jane', photoURL: 'jane.jpg' };
+const user = { uid: '1', name: 'Jane', photoURL: 'jane.jpg', phone: '555-1111' };
 const hall = {
   id: 'arrillaga',
   name: 'Arrillaga',
   members: [
-    { uid: '1', name: 'Jane', photoURL: 'jane.jpg', updatedAt: Date.now() },
-    { uid: '2', name: 'John', photoURL: 'john.jpg', updatedAt: Date.now() },
+    { uid: '1', name: 'Jane', photoURL: 'jane.jpg', updatedAt: Date.now(), phone: '555-1111' },
+    { uid: '2', name: 'John', photoURL: 'john.jpg', updatedAt: Date.now(), phone: '555-2222' },
   ],
 };
 
@@ -154,5 +154,11 @@ describe('HallCard', () => {
     const joinButton = screen.getByRole('button', { name: /join/i });
     expect(joinButton).toBeDisabled();
     expect(joinButton).toHaveAttribute('title', expect.stringMatching(/only join one dining hall/i));
+  });
+
+  it('shows name and phone for all other members', () => {
+    render(<HallCard hall={hall} user={user} />);
+    expect(screen.getByText('John')).toBeInTheDocument();
+    expect(screen.getByText('555-2222')).toBeInTheDocument();
   });
 }); 

@@ -63,7 +63,7 @@ const HallList: React.FC = () => {
               uid: user.uid,
               name: user.name,
               photoURL: user.photoURL || '',
-              phone: user.phone
+              phone: user.phone || ''
             }} />
           </li>
         ))}
