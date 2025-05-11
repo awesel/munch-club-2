@@ -74,13 +74,10 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
         <strong>{hall.name}</strong> <span>{activeMembers.length}</span>
       </div>
       <div>
-        {otherMembers.map(m => (
+        {activeMembers.map(m => (
           <div key={m.uid} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
             <img src={m.photoURL} alt={m.name} style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 8 }} />
-            <span style={{ marginRight: 8 }}>
-              <svg style={{ verticalAlign: 'middle', marginRight: 4 }} width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.708 2.825L15 11.118V5.383zM14.247 12H1.753l4.708-3.825 1.039.623a.5.5 0 0 0 .5 0l1.039-.623L14.247 12zM1 11.118l4.708-2.91L1 5.383v5.735z"/></svg>
-              {m.name}
-            </span>
+            <span style={{ marginRight: 8 }}>{m.name}</span>
             <span style={{ color: '#888' }}>{m.phone}</span>
           </div>
         ))}

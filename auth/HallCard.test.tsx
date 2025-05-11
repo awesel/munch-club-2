@@ -51,8 +51,8 @@ describe('HallCard', () => {
 
   it('renders avatars of current members', () => {
     render(<HallCard hall={hall} user={user} />);
-    // Only other members should be shown
-    expect(screen.queryByAltText('Jane')).not.toBeInTheDocument();
+    // All members should be shown, including the current user
+    expect(screen.getByAltText('Jane')).toBeInTheDocument();
     expect(screen.getByAltText('John')).toBeInTheDocument();
   });
 
