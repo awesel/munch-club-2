@@ -28,6 +28,14 @@ interface User {
 
 const ONE_HOUR = 60 * 60 * 1000;
 
+function formatPhone(phone: string) {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  return phone;
+}
+
 const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
   const { isPresent, join, leave, members } = usePresence(hall, user);
   const [showMatchModal, setShowMatchModal] = useState(false);
@@ -78,7 +86,7 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
           <div key={m.uid} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
             <img src={m.photoURL} alt={m.name} style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 8 }} />
             <span style={{ marginRight: 8 }}>{m.name}</span>
-            <span style={{ color: '#888' }}>{m.phone}</span>
+            <span style={{ color: '#888' }}>{formatPhone(m.phone)}</span>
           </div>
         ))}
       </div>

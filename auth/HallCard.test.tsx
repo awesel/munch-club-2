@@ -184,4 +184,19 @@ describe('HallCard', () => {
     expect(screen.getByRole('button', { name: /i've already texted/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /i'll text now!/i })).toBeInTheDocument();
   });
+
+  it('removes members with updatedAt older than one hour on presence refresh', async () => {
+    const now = Date.now();
+    const freshMember = { uid: '2', name: 'John', photoURL: 'john.jpg', updatedAt: now, phone: '555-2222' };
+    const expiredMember = { uid: '3', name: 'Old', photoURL: 'old.jpg', updatedAt: now - 3600 * 1000 - 1000, phone: '555-3333' };
+    mockUsePresence.mockReturnValueOnce({
+      isPresent: false,
+      join: mockJoin,
+      leave: mockLeave,
+      members: [freshMember, expiredMember],
+    });
+    render(<HallCard hall={hall} user={user} />);
+    expect(screen.getByAltText('John')).toBeInTheDocument();
+    expect(screen.queryByAltText('Old')).not.toBeInTheDocument();
+  });
 }); 

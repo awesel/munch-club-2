@@ -43,11 +43,20 @@ export function usePresence(hall: Hall, user: User) {
   // Listen to group membership
   useEffect(() => {
     const groupRef = doc(db, 'activeGroups', hall.id);
-    unsubRef.current = onSnapshot(groupRef, snap => {
+    unsubRef.current = onSnapshot(groupRef, async snap => {
       const data = snap.data();
       if (data && Array.isArray(data.members)) {
-        setMembers(data.members);
-        setIsPresent(!!data.members.find((m: Member) => m.uid === user.uid));
+        const now = Date.now();
+        const filteredMembers = data.members.filter((m: Member) => now - m.updatedAt < ONE_HOUR);
+        // If any expired members, update Firestore to remove them
+        if (filteredMembers.length !== data.members.length) {
+          await updateDoc(groupRef, {
+            members: filteredMembers,
+            updatedAt: Date.now(),
+          });
+        }
+        setMembers(filteredMembers);
+        setIsPresent(!!filteredMembers.find((m: Member) => m.uid === user.uid));
       } else {
         setMembers([]);
         setIsPresent(false);
@@ -78,7 +87,8 @@ export function usePresence(hall: Hall, user: User) {
       });
     } else {
       const data = snap.data();
-      const filtered = (data.members || []).filter((m: Member) => m.uid !== user.uid);
+      const now = Date.now();
+      const filtered = (data.members || []).filter((m: Member) => now - m.updatedAt < ONE_HOUR && m.uid !== user.uid);
       await updateDoc(groupRef, {
         members: [...filtered, member],
         updatedAt: Date.now(),
@@ -108,9 +118,12 @@ export function usePresence(hall: Hall, user: User) {
       const snap = await getDoc(groupRef);
       if (snap.exists()) {
         const data = snap.data();
-        const membersArr = (data.members || []).map((m: Member) =>
-          m.uid === user.uid ? { ...m, updatedAt: Date.now() } : m
-        );
+        const now = Date.now();
+        const membersArr = (data.members || [])
+          .filter((m: Member) => now - m.updatedAt < ONE_HOUR || m.uid === user.uid)
+          .map((m: Member) =>
+            m.uid === user.uid ? { ...m, updatedAt: Date.now() } : m
+          );
         await updateDoc(groupRef, {
           members: membersArr,
           updatedAt: Date.now(),
