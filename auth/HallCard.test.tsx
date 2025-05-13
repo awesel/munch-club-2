@@ -199,4 +199,11 @@ describe('HallCard', () => {
     expect(screen.getByAltText('John')).toBeInTheDocument();
     expect(screen.queryByAltText('Old')).not.toBeInTheDocument();
   });
+
+  it('renders phone number as a clickable sms link', () => {
+    render(<HallCard hall={hall} user={user} />);
+    // John is the other member
+    const smsLink = screen.getByRole('link', { name: /555-2222/ });
+    expect(smsLink).toHaveAttribute('href', 'sms:555-2222');
+  });
 }); 

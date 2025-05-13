@@ -87,7 +87,11 @@ const HallCard: React.FC<{ hall: Hall; user: User }> = ({ hall, user }) => {
           <div key={m.uid} style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
             <img src={m.photoURL} alt={m.name} style={{ width: 32, height: 32, borderRadius: '50%', marginRight: 8 }} />
             <span style={{ marginRight: 8 }}>{m.name}</span>
-            <span style={{ color: '#888' }}>{formatPhone(m.phone)}</span>
+            <span style={{ color: '#888' }}>
+              <a href={`sms:${m.phone}`} style={{ color: '#888', textDecoration: 'underline' }}>
+                {formatPhone(m.phone)}
+              </a>
+            </span>
           </div>
         ))}
       </div>
