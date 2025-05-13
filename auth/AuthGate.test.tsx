@@ -75,7 +75,9 @@ describe('AuthGate', () => {
     mockOnAuthStateChanged.mockImplementationOnce(cb => cb({ uid: '1', email: 'jane@gmail.com', displayName: 'Jane', photoURL: 'x' }));
     mockValidateStanfordEmail.mockResolvedValueOnce(false);
     render(<AuthGate children={"Protected"} />);
-    await waitFor(() => expect(screen.getByText(/only stanford/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/stanford email required/i)).toBeInTheDocument());
+    expect(screen.getByText(/sign in with your stanford/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
   });
 
   it('shows loading state while checking auth', () => {
@@ -172,5 +174,11 @@ describe('AuthGate', () => {
       phone: '5551234567',
       name: 'Jane D.'
     });
+  });
+
+  it('shows Stanford login prompt for unauthenticated users', async () => {
+    mockOnAuthStateChanged.mockImplementationOnce(cb => cb(null));
+    render(<AuthGate children={"Protected"} />);
+    expect(screen.getByText(/login with your stanford email to eat with your friends/i)).toBeInTheDocument();
   });
 }); 

@@ -81,7 +81,7 @@ export const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) 
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 p-8">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col items-center">
           <h1 className="text-4xl font-extrabold text-center text-purple-700 mb-4 drop-shadow">Munch Club</h1>
-          <p className="text-lg text-gray-700 mb-6 text-center">Eat with your friends!</p>
+          <p className="text-lg text-gray-700 mb-6 text-center">Login with your Stanford email to eat with your friends!</p>
           <button
             onClick={handleLogin}
             aria-label="Sign in with Google"
@@ -93,7 +93,20 @@ export const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) 
       </div>
     );
   if (isStanford === false)
-    return <div>Only Stanford (@stanford.edu) accounts allowed.</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200 p-8">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100 flex flex-col items-center">
+          <h1 className="text-3xl font-extrabold text-center text-purple-700 mb-4 drop-shadow">Stanford Email Required</h1>
+          <p className="text-lg text-gray-700 mb-6 text-center">Sorry, you must sign in with your Stanford (@stanford.edu) email to use Munch Club. Please sign out and try again with your Stanford account.</p>
+          <button
+            onClick={async () => { await signOut(auth); setUser(null); setIsStanford(null); }}
+            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold shadow hover:bg-purple-700 transition text-lg"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
   if (isStanford === null)
     return <div data-testid="auth-loading">Loading…</div>;
   if (!phoneSubmitted) {
