@@ -9,6 +9,7 @@ interface Member {
   uid: string;
   name: string;
   photoURL: string;
+  createdAt: number;
   updatedAt: number;
   phone: string;
 }
