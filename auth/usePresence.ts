@@ -15,6 +15,7 @@ interface Member {
   uid: string;
   name: string;
   photoURL: string;
+  createdAt: number;
   updatedAt: number;
   phone: string;
 }
@@ -47,7 +48,7 @@ export function usePresence(hall: Hall, user: User) {
       const data = snap.data();
       if (data && Array.isArray(data.members)) {
         const now = Date.now();
-        const filteredMembers = data.members.filter((m: Member) => now - m.updatedAt < ONE_HOUR);
+        const filteredMembers = data.members.filter((m: Member) => now - m.createdAt < ONE_HOUR);
         // If any expired members, update Firestore to remove them
         if (filteredMembers.length !== data.members.length) {
           await updateDoc(groupRef, {
@@ -74,6 +75,7 @@ export function usePresence(hall: Hall, user: User) {
       uid: user.uid,
       name: user.name,
       photoURL: user.photoURL,
+      createdAt: Date.now(),
       updatedAt: Date.now(),
       phone: user.phone,
     };
@@ -88,7 +90,7 @@ export function usePresence(hall: Hall, user: User) {
     } else {
       const data = snap.data();
       const now = Date.now();
-      const filtered = (data.members || []).filter((m: Member) => now - m.updatedAt < ONE_HOUR && m.uid !== user.uid);
+      const filtered = (data.members || []).filter((m: Member) => now - m.createdAt < ONE_HOUR && m.uid !== user.uid);
       await updateDoc(groupRef, {
         members: [...filtered, member],
         updatedAt: Date.now(),
@@ -120,7 +122,7 @@ export function usePresence(hall: Hall, user: User) {
         const data = snap.data();
         const now = Date.now();
         const membersArr = (data.members || [])
-          .filter((m: Member) => now - m.updatedAt < ONE_HOUR || m.uid === user.uid)
+          .filter((m: Member) => now - m.createdAt < ONE_HOUR || m.uid === user.uid)
           .map((m: Member) =>
             m.uid === user.uid ? { ...m, updatedAt: Date.now() } : m
           );
